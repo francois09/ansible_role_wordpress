@@ -1,0 +1,97 @@
+---
+- name: Wordpress install packages
+  apt:
+    name: "{{ wordpress__default_packages }}"
+    update_cache: yes
+    state: present
+  when: wordpress__install
+
+- name: MySQL/MariaDB install packages
+  apt:
+    name: "{{ wordpress__db_packages }}"
+    update_cache: yes
+    state: present
+  when: wordpress__install
+
+- name: MySQL/MariaDB user create
+  mysql_user:
+    name: "{{ wordpress__conf.db_user }}"
+    password: "{{ wordpress__conf.db_password }}"
+    priv: "{{ wordpress__conf.db_name }}.*:ALL,GRANT"
+    host: "%"
+    login_user: "{{ database__conf.db_user }}"
+    login_password: "{{ database__conf.db_password }}"
+    login_host: "{{ wordpress__conf.db_host }}"
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: MySQL/MariaDB db create
+  mysql_db:
+    name: "{{ wordpress__conf.db_name }}"
+    login_user: "{{ database__conf.db_user }}"
+    login_password: "{{ database__conf.db_password }}"
+    login_host: "{{ wordpress__conf.db_host }}"
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Create apache service file
+  template:
+    src: vhost.conf
+    dest: "/etc/apache2/sites-available/{{ wordpress__conf.hostname }}"
+  notify: Reload apache2 service
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Create apache2 link service file
+  file:
+    path: "/etc/apache2/sites-enabled/{{ wordpress__conf.hostname }}.conf"
+    src: "/etc/apache2/sites-available/{{ wordpress__conf.hostname }}"
+    state: link
+  notify: Reload apache2 service
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Create wordpress content link file
+  file:
+    path: "/var/www/wordpress"
+    src: "/usr/share/wordpress"
+    state: link
+  notify: Reload apache2 service
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Create wordpress config file
+  template:
+    src: config-site.conf
+    dest: "/etc/wordpress/config-{{ wordpress__conf.hostname }}.php"
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Activate apache2 rewrite module
+  apache2_module:
+    ignore_configcheck: yes
+    name: rewrite
+    state: present
+  notify: Reload apache2 service
+  ignore_errors: True
+  when:
+    - wordpress__install
+    - wordpress__configure
+
+- name: Activate apache2 ssl module
+  apache2_module:
+    ignore_configcheck: yes
+    name: ssl
+    state: present
+  notify: Reload apache2 service
+  ignore_errors: True
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress__use_ssl

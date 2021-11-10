@@ -1,0 +1,24 @@
+---
+# Default do nothing
+wordpress__install: False
+wordpress__configure: False
+
+# defaults file for wordpress
+wordpress__default_packages:
+  - wordpress
+  - wordpress-l10n
+  - wordpress-theme-twentytwentyone
+
+wordpress__db_packages:
+  - python3-pymysql
+
+wordpress__conf:
+  hostname: "www.example.com"
+  admin_mail: "root@example.com"
+  db_host: "database.example.com"
+  db_name: "example"
+  db_user: "user"
+  db_password: "pass"
+  secret_key: "secret_key"
+
+wordpress__use_ssl: False
