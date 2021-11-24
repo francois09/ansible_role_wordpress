@@ -19,8 +19,8 @@
     password: "{{ wordpress__conf.db_password }}"
     priv: "{{ wordpress__conf.db_name }}.*:ALL,GRANT"
     host: "%"
-    login_user: "{{ database__conf.db_user }}"
-    login_password: "{{ database__conf.db_password }}"
+    login_user: "{{ wordpress__conf.db_admin_user }}"
+    login_password: "{{ wordpress__conf.db_admin_password }}"
     login_host: "{{ wordpress__conf.db_host }}"
   when:
     - wordpress__install
@@ -29,8 +29,8 @@
 - name: MySQL/MariaDB db create
   mysql_db:
     name: "{{ wordpress__conf.db_name }}"
-    login_user: "{{ database__conf.db_user }}"
-    login_password: "{{ database__conf.db_password }}"
+    login_user: "{{ wordpress__conf.db_admin_user }}"
+    login_password: "{{ wordpress__conf.db_admin_password }}"
     login_host: "{{ wordpress__conf.db_host }}"
   when:
     - wordpress__install
