@@ -73,6 +73,14 @@
     - wordpress__install
     - wordpress__configure
 
+- name: Create wordpress htaccess file
+  template:
+    src: htaccess
+    dest: "/etc/wordpress/htaccess"
+  when:
+    - wordpress__install
+    - wordpress__configure
+
 - name: Activate apache2 rewrite module
   apache2_module:
     ignore_configcheck: yes
