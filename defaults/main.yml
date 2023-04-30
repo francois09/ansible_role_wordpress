@@ -8,6 +8,10 @@ wordpress__default_packages:
   - wordpress
   - wordpress-l10n
   - wordpress-theme-twentytwentyone
+  - php-curl
+  - php-xml
+  - php-mbstring
+  - php-zip
 
 wordpress__db_packages:
   - python3-pymysql
