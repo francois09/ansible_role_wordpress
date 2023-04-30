@@ -11,6 +11,7 @@ wordpress__default_packages:
   - php-curl
   - php-xml
   - php-mbstring
+  - php-imagick
   - php-zip
 
 wordpress__db_packages:
