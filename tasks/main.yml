@@ -13,47 +13,20 @@
     state: present
   when: wordpress__install
 
-- name: MySQL/MariaDB user create
-  mysql_user:
-    name: "{{ wordpress__conf.db_user }}"
-    password: "{{ wordpress__conf.db_password }}"
-    priv: "{{ wordpress__conf.db_name }}.*:ALL,GRANT"
-    host: "%"
-    login_user: "{{ wordpress__conf.db_admin_user }}"
-    login_password: "{{ wordpress__conf.db_admin_password }}"
-    login_host: "{{ wordpress__conf.db_host }}"
+- name: Single conf tasks
+  include_tasks: singleconf.yml
   when:
     - wordpress__install
     - wordpress__configure
-
-- name: MySQL/MariaDB db create
-  mysql_db:
-    name: "{{ wordpress__conf.db_name }}"
-    login_user: "{{ wordpress__conf.db_admin_user }}"
-    login_password: "{{ wordpress__conf.db_admin_password }}"
-    login_host: "{{ wordpress__conf.db_host }}"
+    - wordpress__conf|type_debug == "dict"
+  
+- name: Multiple conf tasks
+  include_tasks: multiconf.yml
+  with_items: "{{ wordpress__conf }}"
   when:
     - wordpress__install
     - wordpress__configure
-
-- name: Create apache service file
-  template:
-    src: vhost.conf
-    dest: "/etc/apache2/sites-available/{{ wordpress__conf.hostname }}"
-  notify: Reload apache2 service
-  when:
-    - wordpress__install
-    - wordpress__configure
-
-- name: Create apache2 link service file
-  file:
-    path: "/etc/apache2/sites-enabled/{{ wordpress__conf.hostname }}.conf"
-    src: "/etc/apache2/sites-available/{{ wordpress__conf.hostname }}"
-    state: link
-  notify: Reload apache2 service
-  when:
-    - wordpress__install
-    - wordpress__configure
+    - wordpress__conf|type_debug == "list"
 
 - name: Create wordpress content link file
   file:
@@ -61,14 +34,6 @@
     src: "/usr/share/wordpress"
     state: link
   notify: Reload apache2 service
-  when:
-    - wordpress__install
-    - wordpress__configure
-
-- name: Create wordpress config file
-  template:
-    src: config-site.conf
-    dest: "/etc/wordpress/config-{{ wordpress__conf.hostname }}.php"
   when:
     - wordpress__install
     - wordpress__configure
