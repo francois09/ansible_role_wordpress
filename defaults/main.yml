@@ -25,5 +25,4 @@ wordpress__conf:
   db_user: "user"
   db_password: "pass"
   secret_key: "secret_key"
-
-wordpress__use_ssl: False
+  use_ssl: False

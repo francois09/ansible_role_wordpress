@@ -27,6 +27,7 @@
     path: "/etc/apache2/sites-enabled/{{ wordpress__conf.hostname }}.conf"
     src: "/etc/apache2/sites-available/{{ wordpress__conf.hostname }}"
     state: link
+    force: yes
   notify: Reload apache2 service
 
 - name: Create wordpress config file
