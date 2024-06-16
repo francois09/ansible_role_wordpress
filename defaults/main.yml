@@ -7,7 +7,7 @@ wordpress__configure: False
 wordpress__default_packages:
   - wordpress
   - wordpress-l10n
-  - wordpress-theme-twentytwentyone
+  - wordpress-theme-twentytwentythree
   - php-curl
   - php-xml
   - php-mbstring
