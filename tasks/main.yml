@@ -83,3 +83,60 @@
     - wordpress__configure
     - wordpress__conf|type_debug == "list"
     - item.use_ssl
+
+- name: Check if language files are symlinks
+  stat:
+    path: "/var/lib/wordpress/wp_content/languages/admin-fr_FR.mo"
+  register: languages_files
+  check_mode: false
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+
+- name: Replace language files symlinks with files
+  shell:
+    cmd: "rm -fr /var/lib/wordpress/wp_content/languages; cp -pr /usr/share/wordpress/wp-content/languages /var/lib/wordpress/wp_content; chown -R www-data:www-data /var/lib/wordpress/wp_content/languages"
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+    - languages_files.stat.islnk is defined and languages_files.stat.islnk
+
+- name: Check if theme file is symlink
+  stat:
+    path: "/var/lib/wordpress/wp_content/themes/twentytwentythree"
+  register: theme_file
+  check_mode: false
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+
+- name: Replace Theme file symlink with files
+  shell:
+    cmd: "rm -fr /var/lib/wordpress/wp_content/themes/twentytwentythree; cp -pr /usr/share/wordpress/wp-content/themes/twentytwentythree /var/lib/wordpress/wp_content/themes; chown -R www-data:www-data /var/lib/wordpress/wp_content/themes/twentytwentythree"
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+    - theme_file.stat.islnk is defined and theme_file.stat.islnk
+
+- name: Check if plugin file is symlink
+  stat:
+    path: "/var/lib/wordpress/wp_content/plugins/akismet"
+  register: plugin_file
+  check_mode: false
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+
+- name: Replace akismet plugin symlink with files
+  shell:
+    cmd: "rm -fr /var/lib/wordpress/wp_content/plugins/akismet; cp -pr /usr/share/wordpress/wp-content/plugins/akismet /var/lib/wordpress/wp_content/plugins; chown -R www-data:www-data /var/lib/wordpress/wp_content/plugins/akismet"
+  when:
+    - wordpress__install
+    - wordpress__configure
+    - wordpress_writable_files|default(false)
+    - plugin_file.stat.islnk is defined and plugin_file.stat.islnk
